@@ -5,9 +5,6 @@ using UnityEngine;
 public class GeneratorScript : MonoBehaviour {
 
     [SerializeField]
-    private GameObject LifeObject;
-
-    [SerializeField]
     private GameObject[] availableRooms;
 
     [SerializeField]
@@ -33,10 +30,6 @@ public class GeneratorScript : MonoBehaviour {
     void Update () {
 		
 	}
-
-    void initLife() {
-        GameObject life = (GameObject)Instantiate(LifeObject);
-    }
 
     void AddRoom(float farthestRoomEndX) {
         int randomRoomIndex = Random.Range(0, availableRooms.Length);

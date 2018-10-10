@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - LeftEdge
+  - EnemySquareSpikes
+  - Ground
   layers:
   - Default
   - TransparentFX
