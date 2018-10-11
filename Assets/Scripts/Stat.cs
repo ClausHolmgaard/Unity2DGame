@@ -19,7 +19,9 @@ public class Stat {
 
         set {
             _maxValue = value;
-            bar.maxValue = _maxValue;
+            if (bar != null) {
+                bar.maxValue = _maxValue;
+            }
         }
     }
 
@@ -30,7 +32,9 @@ public class Stat {
 
         set {
             _currentValue = Mathf.Clamp(value, 0, maxValue);
-            bar.setValue(_currentValue);
+            if (bar != null) {
+                bar.setValue(_currentValue);
+            }
         }
     }
 

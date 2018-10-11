@@ -82,7 +82,7 @@ public class GeneratorScript : MonoBehaviour {
             currentEdge.GetComponent<BoxCollider2D>().enabled = true;
         }
     }
-        
+
     private IEnumerator GeneratorCheck() {
         while (true) {
             GenerateRoomIfRequired();

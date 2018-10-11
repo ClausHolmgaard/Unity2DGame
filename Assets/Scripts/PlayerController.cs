@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour {
     private float groundOverlapRadius = 0.1f;
     private bool isGrounded = true;
     private bool isRunning;
+    private float xScale;
     public bool isAlive = true;
 
     private Rigidbody2D playerRigidbody;
@@ -38,6 +39,8 @@ public class PlayerController : MonoBehaviour {
     void Start () {
         playerRigidbody = GetComponent<Rigidbody2D>();
         playerAnimator = GetComponent<Animator>();
+
+        xScale = Mathf.Abs(transform.localScale.x);
     }
 	
 	// Update is called once per frame
@@ -53,8 +56,6 @@ public class PlayerController : MonoBehaviour {
         if (isAlive) {
             handleControls();
         }
-
-       
     }
 
     void FixedUpdate() {
@@ -85,19 +86,12 @@ public class PlayerController : MonoBehaviour {
 
         // Flip character to face correct direction
         if (Input.GetAxisRaw("Horizontal") < 0) {
-            transform.localScale = new Vector2(-1, transform.localScale.y);
-        } else {
-            transform.localScale = new Vector2(1, transform.localScale.y);
+            transform.localScale = new Vector2(-xScale, transform.localScale.y);
+        } else if (Input.GetAxisRaw("Horizontal") > 0) {
+            transform.localScale = new Vector2(xScale, transform.localScale.y);
         }
 
-        // Are we jumping.
-        // TODO: Add flying check
-        if (!isGrounded) {
-            playerAnimator.SetTrigger("triggerJump");
-        } else {
-            playerAnimator.SetTrigger("triggerGround");
-        }
-
+        playerAnimator.SetBool("isOnGround", isGrounded);
         playerAnimator.SetBool("isRunning", isRunning);
     }
 
@@ -106,6 +100,7 @@ public class PlayerController : MonoBehaviour {
         // Only jump when on ground
         if (Input.GetButtonDown("Jump") && isGrounded) {
             playerRigidbody.AddForce(new Vector2(0, jumpForce));
+            playerAnimator.SetTrigger("triggerJump");
         }
 
         // Horizontal movement
@@ -122,7 +117,6 @@ public class PlayerController : MonoBehaviour {
         if (collision.gameObject.CompareTag("EnemySquareSpikes")) {
             HitByEnemy(collision);
         }
-
     }
 
     void HitByEnemy(Collider2D enemyCollider) {
