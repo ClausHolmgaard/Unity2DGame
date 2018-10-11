@@ -75,4 +75,9 @@ public class CarControls : MonoBehaviour {
         // Horizontal movement
         playerRigidbody.AddForce(new Vector2(Input.GetAxis("Horizontal") * moveSpeed, 0));
     }
+
+    public void die() {
+        playerAnimator.SetBool("isRunning", false);
+        playerRigidbody.simulated = false;
+    }
 }

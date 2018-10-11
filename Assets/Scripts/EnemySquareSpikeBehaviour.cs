@@ -26,7 +26,11 @@ public class EnemySquareSpikeBehaviour : MonoBehaviour {
 
     private PlayerController player;
     private Rigidbody2D playerRigidBody;
+    private Animator animator;
+    private AudioSource audio;
+
     private Stat health;
+    private bool isAlive = true;
 
     Rigidbody2D thisRigidBody;
 
@@ -40,6 +44,8 @@ public class EnemySquareSpikeBehaviour : MonoBehaviour {
 
         player = targetObject.GetComponent<PlayerController>();
         playerRigidBody = targetObject.GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        audio = GetComponent<AudioSource>();
         thisRigidBody = transform.GetComponent<Rigidbody2D>();
         recentlyHitBy = new Dictionary<int, float>();
 	}
@@ -47,7 +53,7 @@ public class EnemySquareSpikeBehaviour : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        if(health.currentValue <= 0) {
+        if(health.currentValue <= 0 && isAlive) {
             die();
         }
 
@@ -57,6 +63,8 @@ public class EnemySquareSpikeBehaviour : MonoBehaviour {
         }
 
         moveToPlayer();
+
+        animator.SetBool("isAlive", isAlive);
 	}
 
     void moveToPlayer() {
@@ -68,6 +76,9 @@ public class EnemySquareSpikeBehaviour : MonoBehaviour {
     }
 
     private void OnTriggerEnter2D(Collider2D collision) {
+        if(!isAlive) {
+            return;
+        }
         removeOldHits();
 
         if(collision.gameObject.CompareTag("Bullet")) {
@@ -76,6 +87,7 @@ public class EnemySquareSpikeBehaviour : MonoBehaviour {
                 WeaponStat weapon = collision.gameObject.GetComponent<WeaponStat>();
                 health.reduceValue(weapon.damage);
                 recentlyHitBy.Add(hash, Time.time);
+                animator.SetTrigger("triggerDamage");
             }
         }
 
@@ -92,8 +104,12 @@ public class EnemySquareSpikeBehaviour : MonoBehaviour {
     }
 
     private void die() {
+        isAlive = false;
         player.addPoints(worthPoints);
-        Destroy(transform.gameObject);
+        transform.GetComponent<Rigidbody2D>().simulated = false;
+        Destroy(transform.gameObject, 0.2f);
+        animator.SetTrigger("triggerDie");
+        audio.Play();
     }
 
     void removeOldHits() {

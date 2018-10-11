@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour {
     public Transform groundCheckTransform;
     public LayerMask groundCheckLayerMask;
     private Animator playerAnimator;
+    private AudioSource audio;
     private EnemyGenerator spawner;
 
     private Vector3 position;
@@ -41,6 +42,7 @@ public class PlayerController : MonoBehaviour {
     void Start () {
         playerAnimator = GetComponent<Animator>();
         spawner = GetComponent<EnemyGenerator>();
+        audio = GetComponent<AudioSource>();
         car = GetComponent<CarControls>();
     }
 	
@@ -91,6 +93,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void reduceHealth(float reduceHP) {
+        audio.Play();
         health.reduceValue(reduceHP);
     }
     
@@ -98,9 +101,9 @@ public class PlayerController : MonoBehaviour {
     void die() {
         gameOverText.gameObject.SetActive(true);
         isAlive = false;
-        playerAnimator.SetBool("isRunning", false);
-        Rigidbody2D rigidBody = transform.GetComponent<Rigidbody2D>();
-        rigidBody.simulated = false;
+        //playerAnimator.SetBool("isRunning", false);
+        //Rigidbody2D rigidBody = transform.GetComponent<Rigidbody2D>();
+        //rigidBody.simulated = false;
         spawner.stopAll();
         gameState.newEvent(GameState.GameEvents.GameEnd);
     }
