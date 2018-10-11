@@ -7,16 +7,21 @@ public class EnemyGenerator : MonoBehaviour {
     [SerializeField]
     private GameObject squareSpikeEnemy;
 
-    private float minSpawnAhead = 2.0f;
-    private float minSpawnHeight = 0.0f;
-    private float maxSpawnAhead = 10.0f;
-    private float maxSpawnHeight = 4.0f;
+    private float minSpawnAhead = -10.0f;
+    private float minSpawnHeight = 1.5f;
+    private float maxSpawnAhead = 30.0f;
+    private float maxSpawnHeight = 8.0f;
     private float spawnRate = 1.0f;
 
+    private GameObject enemy;
+
+    private List<IEnumerator> coroutines = new List<IEnumerator>();
 
     // Use this for initialization
     void Start () {
-        SpawnSquareSpike();
+        coroutines.Add(SpawnSquareSpikeEnemies());
+
+        startAll();
 	}
 	
 	// Update is called once per frame
@@ -24,22 +29,48 @@ public class EnemyGenerator : MonoBehaviour {
 		
 	}
 
-    void SpawnSquareSpike() {
-        
-
-        Vector2 downLeft = new Vector2(minSpawnAhead, minSpawnHeight);
-        Vector2 upLeft = new Vector2(minSpawnAhead, maxSpawnHeight);
-        Vector2 downRight = new Vector2(maxSpawnAhead, minSpawnHeight);
-        Vector2 upRight = new Vector2(maxSpawnAhead, maxSpawnHeight);
-
-        //enemy.transform.position
-
-        //enemy.transform.position = new Vector3(roomCenter, background_y, 0);
+    public void stopAll() {
+        //StopCoroutine(SpawnSquareSpikeEnemies());
+        foreach (var cr in coroutines) {
+            StopCoroutine(cr);
+        }
     }
 
-    void spawn(GameObject enemy, Transform position) {
-        GameObject enemyInstance = (GameObject)Instantiate(enemy);
-        EnemySquareSpikeBehaviour enemyBehaviour = enemyInstance.GetComponent<EnemySquareSpikeBehaviour>();
+    public void startAll() {
+        foreach (var cr in coroutines) {
+            StartCoroutine(cr);
+        }
+    }
+
+    void SpawnSquareSpike() {
+
+        float spawnX = Random.Range(transform.position.x + minSpawnAhead, transform.position.x + maxSpawnAhead);
+        float spawnY = Random.Range(transform.position.y + minSpawnHeight, transform.position.y + maxSpawnHeight);
+        Vector2 enemyPos = new Vector2(spawnX, spawnY);
+
+
+        //Vector2 enemyPos = new Vector2(transform.position.x + minSpawnAhead, transform.position.y + maxSpawnHeight);
+
+        GameObject enemy = (GameObject)Instantiate(squareSpikeEnemy);
+        EnemySquareSpikeBehaviour enemyBehaviour = enemy.GetComponent<EnemySquareSpikeBehaviour>();
         enemyBehaviour.targetObject = transform.gameObject;
+        enemy.transform.position = enemyPos;
+    }
+
+    public bool setSpawnRate(float rate) {
+        if(rate <= 0) {
+            return false;
+        }
+
+        spawnRate = rate;
+
+        return true;
+    }
+
+    private IEnumerator SpawnSquareSpikeEnemies() {
+        while (true) {
+            SpawnSquareSpike();
+            yield return new WaitForSeconds(spawnRate);
+        }
     }
 }

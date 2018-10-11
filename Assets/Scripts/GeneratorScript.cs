@@ -13,9 +13,6 @@ public class GeneratorScript : MonoBehaviour {
     [SerializeField]
     private int maxNumberOfRooms = 3;
 
-    [SerializeField]
-    private GameObject[] availableEnemeies;
-
     private float screenWidthInPoints;
 
     // Use this for initialization
@@ -38,12 +35,6 @@ public class GeneratorScript : MonoBehaviour {
         float roomCenter = farthestRoomEndX + roomWidth * 0.5f;
         float background_y = -room.transform.Find("Background").localPosition.y;
         room.transform.position = new Vector3(roomCenter, background_y, 0);
-
-        int randomEnemyIndex = Random.Range(0, availableEnemeies.Length);
-        GameObject enemy = (GameObject)Instantiate(availableEnemeies[randomEnemyIndex]);
-        EnemySquareSpikeBehaviour enemyBehaviour = enemy.GetComponent<EnemySquareSpikeBehaviour>();
-        enemyBehaviour.targetObject = transform.gameObject;
-        enemy.transform.position = new Vector3(roomCenter, background_y, 0);
 
         currentRooms.Insert(0, room);
     }

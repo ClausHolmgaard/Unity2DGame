@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 114485452097231206}
   - component: {fileID: 61142173568971264}
   - component: {fileID: 61043681009707484}
+  - component: {fileID: 50579124579866218}
   m_Layer: 0
   m_Name: EnemySquareSpikes
   m_TagString: EnemySquareSpikes
@@ -37,12 +38,32 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1543042751343500}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.71263, y: -4.5785804, z: 0}
+  m_LocalPosition: {x: -0.23167515, y: -5.851201, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!50 &50579124579866218
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1543042751343500}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 5
+  m_LinearDrag: 1
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!61 &61043681009707484
 BoxCollider2D:
   m_ObjectHideFlags: 1
@@ -105,6 +126,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 0}
+  worthPoints: 10
+  damage: 25
+  pushStrength: 700
+  moveSpeed: 10
+  maxHP: 5
 --- !u!212 &212780307686262932
 SpriteRenderer:
   m_ObjectHideFlags: 1

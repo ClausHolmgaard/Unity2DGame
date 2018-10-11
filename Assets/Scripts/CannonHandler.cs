@@ -13,6 +13,9 @@ public class CannonHandler : MonoBehaviour {
     [SerializeField]
     private GameObject bullet;
 
+    [SerializeField]
+    private float bulletLifeTime = 3.0f;
+
     private Vector2 direction;
 
 	// Use this for initialization
@@ -23,13 +26,9 @@ public class CannonHandler : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         TurnCannon();
-
-        if(Input.GetButtonDown("Fire1")) {
-            Fire();
-        }
 	}
 
-    private void Fire() {
+    public void Fire() {
         GameObject newBullet = (GameObject)Instantiate(bullet);
 
         Transform origin = transform.Find("BulletOrigin");
@@ -38,7 +37,7 @@ public class CannonHandler : MonoBehaviour {
 
         newBulletBody.AddForce(transform.up * bulletSpeed);
 
-        Destroy(newBullet, 10.0f);
+        Destroy(newBullet, bulletLifeTime);
     }
 
     private void TurnCannon() {
@@ -54,7 +53,7 @@ public class CannonHandler : MonoBehaviour {
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90;  // -90 due to sprite offset
         Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
-        //transform.rotation = rotation;
+        //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
+        transform.rotation = rotation;
     }
 }

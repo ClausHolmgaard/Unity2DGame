@@ -9,7 +9,7 @@ public class BarHandler : MonoBehaviour {
     private Image content;
 
     [SerializeField]
-    private float lerpSpeed = 2.0f;
+    private float lerpSpeed = 20.0f;
 
     [HideInInspector]
     public float maxValue = 0.0f;
@@ -25,7 +25,7 @@ public class BarHandler : MonoBehaviour {
 	void Update () {
         content.fillAmount = Mathf.Lerp(content.fillAmount, fillAmount, lerpSpeed * Time.deltaTime);
 	}
-
+    
     public void setValue(float value) {
         // Make sure maxvalue is initialized
         if(maxValue == 0.0) {
