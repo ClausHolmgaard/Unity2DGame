@@ -24,9 +24,12 @@ public class PlayerController : MonoBehaviour {
 
     public Transform groundCheckTransform;
     public LayerMask groundCheckLayerMask;
-    private AudioSource audioS;
+    private AudioSource playerAudio;
     private SpawnHandler spawner;
-    private SpriteRenderer thisRenderer;
+    private SpriteRenderer playerRenderer;
+    private Animator playerAnimator;
+    private BoxCollider2D playerCollider;
+    private Rigidbody2D playerRigidBody;
 
     private Vector3 position;
 
@@ -45,15 +48,20 @@ public class PlayerController : MonoBehaviour {
     // Use this for initialization
     void Start () {
         spawner = GetComponent<SpawnHandler>();
-        audioS = GetComponent<AudioSource>();
+        playerAudio = GetComponent<AudioSource>();
         car = GetComponent<CarControls>();
         fly = GetComponent<FlyControls>();
         gameState = GetComponent<GameState>();
-        thisRenderer = GetComponent<SpriteRenderer>();
+        playerRenderer = GetComponent<SpriteRenderer>();
+        playerAnimator = GetComponent<Animator>();
+        playerCollider = GetComponent<BoxCollider2D>();
+        playerRigidBody = GetComponent<Rigidbody2D>();
 
         // Start on ground
         vehicleState = VehicleStateEnum.Ground;
         currentControls = car;
+
+        //playerAnimator.runtimeAnimatorController = groundAnimator;
     }
 	
 	// Update is called once per frame
@@ -66,10 +74,6 @@ public class PlayerController : MonoBehaviour {
             die();
         }
 
-        if (gameState.getState() == GameState.GameStateEnum.Running) {
-            handleControls();
-        }
-
         if (vehicleState == VehicleStateEnum.Ground) {
             currentControls = car;
         } else if (vehicleState == VehicleStateEnum.Fly) {
@@ -78,7 +82,9 @@ public class PlayerController : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        
+        if (gameState.getState() == GameState.GameStateEnum.Running) {
+            handleControls();
+        }
     }
     
     public void restart() {
@@ -90,7 +96,7 @@ public class PlayerController : MonoBehaviour {
     void handleControls() {
         
         if(Input.GetButtonDown("Transform")) {
-            print("Transforming");
+            doTransform();
         }
 
         currentControls.setGrounded(isGrounded);
@@ -101,22 +107,37 @@ public class PlayerController : MonoBehaviour {
 
     void doTransform() {
         if(vehicleState == VehicleStateEnum.Ground) {
-            transforToFly();
+            transformToFly();
         } else {
             transformToCar();
         }
     }
 
     void transformToCar() {
+        print("Driving!");
+        car.enable();
+        fly.disable();
         vehicleState = VehicleStateEnum.Ground;
+
+        playerAnimator.SetBool("isGroundVehicle", true);
+
+        
+
+        currentControls = car;
     }
 
-    void transforToFly() {
+    void transformToFly() {
+        print("Flying!");
+        car.disable();
+        fly.enable();
         vehicleState = VehicleStateEnum.Fly;
+        playerAnimator.SetBool("isGroundVehicle", false);
+    
+        currentControls = fly;
     }
 
     public void reduceHealth(float reduceHP) {
-        audioS.Play();
+        playerAudio.Play();
         health.reduceValue(reduceHP);
         StartCoroutine(flashRed());
     }
@@ -132,10 +153,10 @@ public class PlayerController : MonoBehaviour {
     }
 
     IEnumerator flashRed() {
-        Color oldColor = thisRenderer.color;
-        thisRenderer.color = Color.red;
+        Color oldColor = playerRenderer.color;
+        playerRenderer.color = Color.red;
         yield return new WaitForSeconds(0.1f);
-        thisRenderer.color = oldColor;
+        playerRenderer.color = oldColor;
     }
 
     public GameState getGameState() {

@@ -11,13 +11,20 @@ public class CarControls : MonoBehaviour, IControls {
     private float moveSpeed = 10.0f;
 
     [SerializeField]
+    private float groundDrag = 1.0f;
+
+    [SerializeField]
     private GameObject cannon;
 
     private CannonHandler cannonHandler;
     private Animator playerAnimator;
     private Rigidbody2D playerRigidbody;
+    private SpriteRenderer cannonSprite;
+    private BoxCollider2D playerCollider;
 
     private float xScale;
+    private float groundScale = 4.0f;
+    private float groundGravScale = 1.0f;
 
     private bool isRunning = false;
     private bool isGrounded = true;
@@ -26,8 +33,8 @@ public class CarControls : MonoBehaviour, IControls {
         playerRigidbody = GetComponent<Rigidbody2D>();
         playerAnimator = GetComponent<Animator>();
         cannonHandler = cannon.GetComponent<CannonHandler>();
-
-        xScale = Mathf.Abs(playerRigidbody.transform.localScale.x);
+        cannonSprite = cannon.GetComponent<SpriteRenderer>();
+        playerCollider = GetComponent<BoxCollider2D>();
     }
 
     public void handleWeapons() {
@@ -52,11 +59,7 @@ public class CarControls : MonoBehaviour, IControls {
             isRunning = false;
         }
 
-        // Moving on y axis
-        if (Input.GetAxisRaw("Vertical") != 0) {
-            // Ready for flying!
-        }
-
+        xScale = Mathf.Abs(transform.localScale.x);
         // Flip character to face correct direction
         if (Input.GetAxisRaw("Horizontal") < 0) {
             transform.localScale = new Vector2(-xScale, transform.localScale.y);
@@ -72,7 +75,6 @@ public class CarControls : MonoBehaviour, IControls {
 
         // Only jump when on ground
         if (Input.GetButtonDown("Jump") && isGrounded) {
-            print("Jumping!");
             playerRigidbody.AddForce(new Vector2(0, jumpForce));
             playerAnimator.SetTrigger("triggerJump");
         }
@@ -84,5 +86,35 @@ public class CarControls : MonoBehaviour, IControls {
     public void die() {
         playerAnimator.SetBool("isRunning", false);
         playerRigidbody.simulated = false;
+    }
+
+    public void disable() {
+        cannonSprite.enabled = false;
+    }
+
+    public void enable() {
+        cannonSprite.enabled = true;
+
+        playerRigidbody.gravityScale = groundGravScale;
+        playerRigidbody.drag = groundDrag;
+
+        // ugly transforms, due to different sprite sizes
+        setScale(groundScale);
+
+        Vector2 boxSize = new Vector2(0.4f, 0.15f);
+        playerCollider.size = boxSize;
+
+        Vector2 boxOffset = new Vector2(0.0f, -0.02f);
+        playerCollider.offset = boxOffset;
+    }
+
+    void setScale(float scaleFactor) {
+        /*
+        Vector2 scale = transform.localScale;
+        scale *= scaleFactor;
+        transform.localScale = scale;
+        */
+        Vector2 scale = new Vector2(scaleFactor, scaleFactor);
+        transform.localScale = scale;
     }
 }

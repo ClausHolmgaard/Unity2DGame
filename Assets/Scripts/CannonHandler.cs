@@ -16,11 +16,16 @@ public class CannonHandler : MonoBehaviour {
     [SerializeField]
     private float bulletLifeTime = 3.0f;
 
+    [SerializeField]
+    private GameObject player;
+
     private Vector2 direction;
+
+    private BoxCollider2D playerCollider;
 
 	// Use this for initialization
 	void Start () {
-        
+        playerCollider = player.GetComponent<BoxCollider2D>();
 	}
 	
 	// Update is called once per frame
@@ -36,6 +41,13 @@ public class CannonHandler : MonoBehaviour {
         Transform origin = transform.Find("BulletOrigin");
         newBullet.transform.position = origin.position;
         Rigidbody2D newBulletBody = newBullet.GetComponent<Rigidbody2D>();
+        
+        foreach (CircleCollider2D coll in newBullet.GetComponents<CircleCollider2D>()) {
+            if(!coll.isTrigger) {
+                Physics2D.IgnoreCollision(coll, playerCollider);
+                print(Physics2D.GetIgnoreCollision(coll, playerCollider));
+            }
+        }
 
         newBulletBody.AddForce(transform.up * bulletSpeed);
 

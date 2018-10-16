@@ -26,7 +26,7 @@ public class SpawnHandler : MonoBehaviour {
         }
     }
 
-    SpawnSettings squareSpikeSettings = new SpawnSettings(-5.0f, 30.0f, 1.5f, 8.0f, 1.0f);
+    SpawnSettings squareSpikeSettings = new SpawnSettings(-5.0f, 30.0f, 1.5f, 8.0f, 4.0f);
     SpawnSettings heartSettings = new SpawnSettings(1.0f, 30.0f, 1.5f, 8.0f, 10.0f); 
 
     private GameObject enemySpawn;
@@ -38,7 +38,6 @@ public class SpawnHandler : MonoBehaviour {
     // Use this for initialization
     void Start() {
         
-
         spawners.Add(SpawnSquareSpikeEnemies());
         spawners.Add(SpawnHearts());
 
