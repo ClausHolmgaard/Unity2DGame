@@ -47,7 +47,6 @@ public class HeartScript : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision) {
         if (collision.gameObject.CompareTag("Player")) {
-            print("Heart hit!");
             GameObject player = collision.gameObject;
             PlayerController playerController = player.GetComponent<PlayerController>();
 

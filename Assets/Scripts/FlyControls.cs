@@ -57,8 +57,8 @@ public class FlyControls : MonoBehaviour, IControls {
 
         //playerRigidbody.AddForce(new Vector2(Input.GetAxis("Horizontal") * moveSpeed, Input.GetAxis("Vertical") * moveSpeed));
         Vector2 pos = transform.position;
-        pos.x += Input.GetAxis("Horizontal") * moveSpeed;
-        pos.y += Input.GetAxis("Vertical") * moveSpeed;
+        pos.x += Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
+        pos.y += Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
         transform.position = pos;
 
 

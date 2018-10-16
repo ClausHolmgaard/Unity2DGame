@@ -31,13 +31,16 @@ public class SpawnHandler : MonoBehaviour {
 
     private GameObject enemySpawn;
     private GameObject heartSpawn;
-
+    private List<GameObject> allHearts = new List<GameObject>();
+    private BoxCollider2D playerCollider;
 
     private List<IEnumerator> spawners = new List<IEnumerator>();
 
     // Use this for initialization
     void Start() {
-        
+
+        playerCollider = transform.GetComponent<BoxCollider2D>();
+
         spawners.Add(SpawnSquareSpikeEnemies());
         spawners.Add(SpawnHearts());
 
@@ -83,6 +86,14 @@ public class SpawnHandler : MonoBehaviour {
 
     void SpawnHeart() {
         heartSpawn = Spawn(heart, heartSettings);
+
+        foreach (BoxCollider2D coll in heartSpawn.GetComponents<BoxCollider2D>()) {
+            if (!coll.isTrigger) {
+                Physics2D.IgnoreCollision(coll, playerCollider);
+            }
+        }
+
+        allHearts.Add(heartSpawn);
     }
 
     public bool setSpawnRate(float rate) {
@@ -107,5 +118,23 @@ public class SpawnHandler : MonoBehaviour {
             SpawnHeart();
             yield return new WaitForSeconds(heartSettings.spawnRate);
         }
+    }
+
+    public List<GameObject> GetAllHearts() {
+
+        List<GameObject> removeHearts = new List<GameObject>();
+
+        foreach (GameObject h in allHearts) {
+            if (h == null) {
+                //allHearts.Remove(h);
+                removeHearts.Add(h);
+            }
+        }
+
+        foreach (GameObject g in removeHearts) {
+            allHearts.Remove(g);
+        }
+
+        return allHearts;
     }
 }

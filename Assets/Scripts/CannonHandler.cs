@@ -45,7 +45,6 @@ public class CannonHandler : MonoBehaviour {
         foreach (CircleCollider2D coll in newBullet.GetComponents<CircleCollider2D>()) {
             if(!coll.isTrigger) {
                 Physics2D.IgnoreCollision(coll, playerCollider);
-                print(Physics2D.GetIgnoreCollision(coll, playerCollider));
             }
         }
 

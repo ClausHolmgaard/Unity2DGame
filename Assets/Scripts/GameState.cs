@@ -6,7 +6,9 @@ using UnityEngine.SceneManagement;
 public class GameState : MonoBehaviour {
 
     [SerializeField]
-    private GameObject player;
+    private GameObject canvas;
+
+    private CanvasStates canvasStates;
 
 	public enum GameStateEnum {
         PauseMenu,
@@ -19,25 +21,31 @@ public class GameState : MonoBehaviour {
         GameKeyExit,
         GameKeyConfirm,
         GameKeyPause,
+        GameKeyFire,
         GameOver
     }
 
     private bool stateChanged = false;
 
-    private GameStateEnum currentState = GameStateEnum.Running;
+    private GameStateEnum currentState = GameStateEnum.StartMenu;
+
+    private void Start() {
+        Time.timeScale = 0.0f;
+
+        canvasStates = canvas.GetComponent<CanvasStates>();
+    }
 
     private void Update() {
         if (Input.GetButtonDown("Pause")) {
             newEvent(GameEventsEnum.GameKeyPause);
-        }
-
-        if (Input.GetButtonDown("Confirm")) {
+        } else if (Input.GetButtonDown("Confirm")) {
             newEvent(GameEventsEnum.GameKeyConfirm);
-        }
-
-        if (Input.GetButtonDown("Exit")) {
+        } else if (Input.GetButtonDown("Exit")) {
             newEvent(GameEventsEnum.GameKeyExit);
+        } else if (Input.GetButtonDown("Fire1") ) {
+            newEvent(GameEventsEnum.GameKeyFire);
         }
+        
     }
 
     public GameStateEnum getState() {
@@ -55,7 +63,9 @@ public class GameState : MonoBehaviour {
                         exitGame();
                         break;
                     case GameEventsEnum.GameKeyConfirm:
+                    case GameEventsEnum.GameKeyFire:
                         continueGame();
+                        canvasStates.showHelpText(5.0f);
                         break;
                     default:
                         noStateChange();
@@ -71,7 +81,9 @@ public class GameState : MonoBehaviour {
                         exitGame();
                         break;
                     case GameEventsEnum.GameKeyConfirm:
+                    case GameEventsEnum.GameKeyFire:
                         continueGame();
+                        canvasStates.showHelpText();
                         break;
                     default:
                         noStateChange();
@@ -153,7 +165,7 @@ public class GameState : MonoBehaviour {
 
     void restartGame() {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        player.GetComponent<PlayerController>().restart();
+        transform.GetComponent<PlayerController>().restart();
         changeState(GameStateEnum.Running);
         Time.timeScale = 1.0f;
     }

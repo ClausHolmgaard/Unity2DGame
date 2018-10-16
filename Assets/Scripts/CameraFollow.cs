@@ -7,15 +7,13 @@ public class CameraFollow : MonoBehaviour {
     [SerializeField]
     private GameObject targetObject;
 
+    [SerializeField]
+    private float offset = 0.0f;
+
     private float distanceToTarget;
 
     // Use this for initialization
     void Start () {
-        //float pixelToUnits = 100;
-        //float cameraSize = (Screen.height / 2) / pixelToUnits;
-        //Camera.main.orthographic = true;
-        //Camera.main.orthographicSize = cameraSize;
-
         distanceToTarget = transform.position.x - targetObject.transform.position.x;
     }
 	
@@ -24,7 +22,7 @@ public class CameraFollow : MonoBehaviour {
         float targetObjectX = targetObject.transform.position.x;
         //float targetObjectY = targetObject.transform.position.y;
         Vector3 newCameraPosition = transform.position;
-        newCameraPosition.x = targetObjectX + distanceToTarget;
+        newCameraPosition.x = targetObjectX + distanceToTarget + offset;
         //newCameraPosition.y = targetObjectY;
         transform.position = newCameraPosition;
 

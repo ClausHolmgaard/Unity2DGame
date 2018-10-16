@@ -80,7 +80,7 @@ public class CarControls : MonoBehaviour, IControls {
         }
 
         // Horizontal movement
-        playerRigidbody.AddForce(new Vector2(Input.GetAxis("Horizontal") * moveSpeed, 0));
+        playerRigidbody.AddForce(new Vector2(Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0));
     }
 
     public void die() {
@@ -109,11 +109,6 @@ public class CarControls : MonoBehaviour, IControls {
     }
 
     void setScale(float scaleFactor) {
-        /*
-        Vector2 scale = transform.localScale;
-        scale *= scaleFactor;
-        transform.localScale = scale;
-        */
         Vector2 scale = new Vector2(scaleFactor, scaleFactor);
         transform.localScale = scale;
     }

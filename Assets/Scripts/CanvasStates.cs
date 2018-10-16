@@ -14,6 +14,18 @@ public class CanvasStates : MonoBehaviour {
     [SerializeField]
     private Text pauseText;
 
+    [SerializeField]
+    private Text startText;
+
+    [SerializeField]
+    private Text helpText;
+
+    [SerializeField]
+    private float helpTextDuration = 10.0f;
+
+    [SerializeField]
+    private float fadeOutTime = 1.0f;
+
     private GameState gameState;
 
 	// Use this for initialization
@@ -36,6 +48,7 @@ public class CanvasStates : MonoBehaviour {
                 showPauseMenu();
                 break;
             case GameState.GameStateEnum.StartMenu:
+                showStartMenu();
                 break;
             case GameState.GameStateEnum.Running:
                 break;
@@ -50,6 +63,7 @@ public class CanvasStates : MonoBehaviour {
     void hideAllMenu() {
         gameOverText.gameObject.SetActive(false);
         pauseText.gameObject.SetActive(false);
+        startText.gameObject.SetActive(false);
     }
 
     void showGameOverMenu() {
@@ -57,10 +71,35 @@ public class CanvasStates : MonoBehaviour {
     }
 
     void showPauseMenu() {
+        helpText.gameObject.SetActive(false);
         pauseText.gameObject.SetActive(true);
     }
 
     void showStartMenu() {
-
+        startText.gameObject.SetActive(true);
     }
+
+    public void showHelpText() {
+        StartCoroutine(HelpTextWithTimeout(helpTextDuration));
+    }
+
+    public void showHelpText(float duration) {
+        StartCoroutine(HelpTextWithTimeout(duration));
+    }
+
+    IEnumerator HelpTextWithTimeout(float duration) {
+        helpText.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(duration - fadeOutTime);
+
+        Color originalColor = helpText.color;
+        for (float t = 0.01f; t < fadeOutTime; t += Time.deltaTime) {
+            helpText.color = Color.Lerp(originalColor, Color.clear, Mathf.Min(1, t / fadeOutTime));
+            yield return null;
+        }
+
+        helpText.gameObject.SetActive(false);
+        helpText.color = originalColor;
+    }
+
 }

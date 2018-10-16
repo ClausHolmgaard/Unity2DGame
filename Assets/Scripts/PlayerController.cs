@@ -11,6 +11,15 @@ public class PlayerController : MonoBehaviour {
     [SerializeField]
     private Text pointText;
 
+    [SerializeField]
+    private ParticleSystem transformParticles;
+
+    [SerializeField]
+    private Camera playerCamera;
+
+    [SerializeField]
+    private GameObject heartIndicator;
+
     GameState gameState;
 
     CarControls car;
@@ -21,6 +30,8 @@ public class PlayerController : MonoBehaviour {
     private int currentPoints = 0;
     public bool isAlive = true;
     bool isGrounded = true;
+    float animationHideTime = 0.2f;
+    float screenWidthInPoints;
 
     public Transform groundCheckTransform;
     public LayerMask groundCheckLayerMask;
@@ -30,6 +41,7 @@ public class PlayerController : MonoBehaviour {
     private Animator playerAnimator;
     private BoxCollider2D playerCollider;
     private Rigidbody2D playerRigidBody;
+    private SpriteRenderer heartIndicatorRenderer;
 
     private Vector3 position;
 
@@ -47,6 +59,9 @@ public class PlayerController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        float height = 2.0f * Camera.main.orthographicSize;
+        screenWidthInPoints = height * Camera.main.aspect;
+
         spawner = GetComponent<SpawnHandler>();
         playerAudio = GetComponent<AudioSource>();
         car = GetComponent<CarControls>();
@@ -56,12 +71,11 @@ public class PlayerController : MonoBehaviour {
         playerAnimator = GetComponent<Animator>();
         playerCollider = GetComponent<BoxCollider2D>();
         playerRigidBody = GetComponent<Rigidbody2D>();
+        heartIndicatorRenderer = heartIndicator.GetComponent<SpriteRenderer>();
 
         // Start on ground
         vehicleState = VehicleStateEnum.Ground;
         currentControls = car;
-
-        //playerAnimator.runtimeAnimatorController = groundAnimator;
     }
 	
 	// Update is called once per frame
@@ -74,17 +88,61 @@ public class PlayerController : MonoBehaviour {
             die();
         }
 
+        if (gameState.getState() == GameState.GameStateEnum.Running) {
+            handleControls();
+        }
+
         if (vehicleState == VehicleStateEnum.Ground) {
             currentControls = car;
         } else if (vehicleState == VehicleStateEnum.Fly) {
             currentControls = fly;
         }
+
+        IndicateHeart();
     }
 
     void FixedUpdate() {
-        if (gameState.getState() == GameState.GameStateEnum.Running) {
-            handleControls();
+        
+    }
+
+    void IndicateHeart() {
+        List<GameObject> hearts = spawner.GetAllHearts();
+
+        if(hearts.Count <= 0) {
+            heartIndicatorRenderer.enabled = false;
+            return;
         }
+
+        GameObject closestHeart = null;
+        float closestDist = 0.0f;
+        float dist;
+        foreach(GameObject h in hearts) {
+            dist = Vector2.Distance(transform.position, h.transform.position);
+            if(closestDist == 0.0f) {
+                closestDist = dist;
+                closestHeart = h;
+            } else if(dist < closestDist) {
+                closestDist = dist;
+                closestHeart = h;
+            }
+        }
+
+        if (closestHeart != null) {
+            if(closestDist > screenWidthInPoints/2) {
+                heartIndicatorRenderer.enabled = true;
+                Vector2 pos = new Vector2();
+                if(closestHeart.transform.position.x < transform.position.x) {
+                    pos.x = playerCamera.transform.position.x - screenWidthInPoints / 2;
+                } else {
+                    pos.x = playerCamera.transform.position.x + screenWidthInPoints / 2;
+                }
+                pos.y = closestHeart.transform.position.y;
+                heartIndicator.transform.position = pos;
+            } else {
+                heartIndicatorRenderer.enabled = false;
+            }
+        }
+
     }
     
     public void restart() {
@@ -106,33 +164,41 @@ public class PlayerController : MonoBehaviour {
     }
 
     void doTransform() {
+
+        StartCoroutine(HideForSeconds());
+
+        transformParticles.Play();
         if(vehicleState == VehicleStateEnum.Ground) {
             transformToFly();
         } else {
             transformToCar();
         }
+
+    }
+
+    IEnumerator HideForSeconds() {
+        playerRenderer.enabled = false;
+        yield return new WaitForSeconds(animationHideTime);
+        playerRenderer.enabled = true;
     }
 
     void transformToCar() {
-        print("Driving!");
-        car.enable();
-        fly.disable();
-        vehicleState = VehicleStateEnum.Ground;
 
         playerAnimator.SetBool("isGroundVehicle", true);
-
-        
+        fly.disable();
+        car.enable();
+        vehicleState = VehicleStateEnum.Ground;
 
         currentControls = car;
     }
 
     void transformToFly() {
-        print("Flying!");
+
+        playerAnimator.SetBool("isGroundVehicle", false);
         car.disable();
         fly.enable();
         vehicleState = VehicleStateEnum.Fly;
-        playerAnimator.SetBool("isGroundVehicle", false);
-    
+
         currentControls = fly;
     }
 
