@@ -92,7 +92,6 @@ public class EnemySquareSpikeBehaviour : MonoBehaviour {
                 health.reduceValue(weapon.damage);
                 recentlyHitBy.Add(hash, Time.time);
                 animator.SetTrigger("triggerDamage");
-                print("Flash!");
                 StartCoroutine(flashRed());
             }
         }

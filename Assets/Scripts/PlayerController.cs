@@ -12,19 +12,30 @@ public class PlayerController : MonoBehaviour {
     private Text pointText;
 
     GameState gameState;
+
     CarControls car;
+    FlyControls fly;
+    IControls currentControls;
 
     private float xScale;
     private int currentPoints = 0;
     public bool isAlive = true;
+    bool isGrounded = true;
 
     public Transform groundCheckTransform;
     public LayerMask groundCheckLayerMask;
     private AudioSource audioS;
-    private EnemyGenerator spawner;
+    private SpawnHandler spawner;
     private SpriteRenderer thisRenderer;
 
     private Vector3 position;
+
+    public enum VehicleStateEnum {
+        Ground,
+        Fly
+    }
+
+    private VehicleStateEnum vehicleState = new VehicleStateEnum();
 
     private void Awake() {
         health.maxValue = 100.0f;
@@ -33,17 +44,24 @@ public class PlayerController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        spawner = GetComponent<EnemyGenerator>();
+        spawner = GetComponent<SpawnHandler>();
         audioS = GetComponent<AudioSource>();
         car = GetComponent<CarControls>();
+        fly = GetComponent<FlyControls>();
         gameState = GetComponent<GameState>();
         thisRenderer = GetComponent<SpriteRenderer>();
+
+        // Start on ground
+        vehicleState = VehicleStateEnum.Ground;
+        currentControls = car;
     }
 	
 	// Update is called once per frame
 	void Update () {
 
-        if(health.currentValue <= 0 && isAlive) {
+        isGrounded = Physics2D.OverlapCircle(groundCheckTransform.position, 0.1f, groundCheckLayerMask);
+
+        if (health.currentValue <= 0 && isAlive) {
             Debug.Log("Player died!");
             die();
         }
@@ -51,12 +69,17 @@ public class PlayerController : MonoBehaviour {
         if (gameState.getState() == GameState.GameStateEnum.Running) {
             handleControls();
         }
+
+        if (vehicleState == VehicleStateEnum.Ground) {
+            currentControls = car;
+        } else if (vehicleState == VehicleStateEnum.Fly) {
+            currentControls = fly;
+        }
     }
 
     void FixedUpdate() {
         
     }
-
     
     public void restart() {
         health.maxValue = 100.0f;
@@ -65,15 +88,47 @@ public class PlayerController : MonoBehaviour {
     }
 
     void handleControls() {
-        car.handleWeapons();
-        car.doMovement();
-        car.handleMoveStates();
+        
+        if(Input.GetButtonDown("Transform")) {
+            print("Transforming");
+        }
+
+        currentControls.setGrounded(isGrounded);
+        currentControls.handleWeapons();
+        currentControls.doMovement();
+        currentControls.handleMoveStates();
+    }
+
+    void doTransform() {
+        if(vehicleState == VehicleStateEnum.Ground) {
+            transforToFly();
+        } else {
+            transformToCar();
+        }
+    }
+
+    void transformToCar() {
+        vehicleState = VehicleStateEnum.Ground;
+    }
+
+    void transforToFly() {
+        vehicleState = VehicleStateEnum.Fly;
     }
 
     public void reduceHealth(float reduceHP) {
         audioS.Play();
         health.reduceValue(reduceHP);
         StartCoroutine(flashRed());
+    }
+
+    public void increaseHealth(float increaseHP) {
+        health.increaseValue(increaseHP);
+        // TODO: Play sound?
+        // TODO: Flash green?
+    }
+
+    public bool isHealthMax() {
+        return health.isMax();
     }
 
     IEnumerator flashRed() {
@@ -103,4 +158,5 @@ public class PlayerController : MonoBehaviour {
         print("Setting spawn rate at: " + rate);
         spawner.setSpawnRate(rate);
     }
+
 }

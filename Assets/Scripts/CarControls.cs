@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CarControls : MonoBehaviour {
+public class CarControls : MonoBehaviour, IControls {
 
     [SerializeField]
     private float jumpForce = 50f;
@@ -34,6 +34,10 @@ public class CarControls : MonoBehaviour {
         if (Input.GetButtonDown("Fire1")) {
             cannonHandler.Fire();
         }
+    }
+
+    public void setGrounded(bool grounded) {
+        isGrounded = grounded;
     }
 
     public void handleMoveStates() {
@@ -68,6 +72,7 @@ public class CarControls : MonoBehaviour {
 
         // Only jump when on ground
         if (Input.GetButtonDown("Jump") && isGrounded) {
+            print("Jumping!");
             playerRigidbody.AddForce(new Vector2(0, jumpForce));
             playerAnimator.SetTrigger("triggerJump");
         }

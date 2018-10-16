@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class HeartScript : MonoBehaviour {
 
+    [SerializeField]
+    private float healthValue = 10.0f;
+
     float scaleSpeed = 3.0f;
     float scaleFactor = 0.5f;
 
@@ -41,4 +44,17 @@ public class HeartScript : MonoBehaviour {
         }
 
 	}
+
+    private void OnTriggerEnter2D(Collider2D collision) {
+        if (collision.gameObject.CompareTag("Player")) {
+            print("Heart hit!");
+            GameObject player = collision.gameObject;
+            PlayerController playerController = player.GetComponent<PlayerController>();
+
+            if (!playerController.isHealthMax()) {
+                playerController.increaseHealth(healthValue);
+                Destroy(gameObject);
+            }
+        }
+    }
 }

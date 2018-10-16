@@ -7,27 +7,48 @@ public class SpawnHandler : MonoBehaviour {
     [SerializeField]
     private GameObject squareSpikeEnemy;
 
-    private float minSpawnAhead = -10.0f;
-    private float minSpawnHeight = 1.5f;
-    private float maxSpawnAhead = 30.0f;
-    private float maxSpawnHeight = 8.0f;
-    private float spawnRate = 1.0f;
+    [SerializeField]
+    private GameObject heart;
 
-    private GameObject enemy;
+    private struct SpawnSettings {
+        public float minSpawnAhead;
+        public float minSpawnHeight;
+        public float maxSpawnAhead;
+        public float maxSpawnHeight;
+        public float spawnRate;
+
+        public SpawnSettings(float minAhead, float maxAhead, float minHeight, float maxHeight, float rate) {
+            minSpawnAhead = minAhead;
+            maxSpawnAhead = maxAhead;
+            minSpawnHeight = minHeight;
+            maxSpawnHeight = maxHeight;
+            spawnRate = rate;
+        }
+    }
+
+    SpawnSettings squareSpikeSettings = new SpawnSettings(-5.0f, 30.0f, 1.5f, 8.0f, 1.0f);
+    SpawnSettings heartSettings = new SpawnSettings(1.0f, 30.0f, 1.5f, 8.0f, 10.0f); 
+
+    private GameObject enemySpawn;
+    private GameObject heartSpawn;
+
 
     private List<IEnumerator> spawners = new List<IEnumerator>();
 
     // Use this for initialization
-    void Start () {
+    void Start() {
+        
+
         spawners.Add(SpawnSquareSpikeEnemies());
+        spawners.Add(SpawnHearts());
 
         startAll();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    }
+
+    // Update is called once per frame
+    void Update() {
+
+    }
 
     public void stopAll() {
         //StopCoroutine(SpawnSquareSpikeEnemies());
@@ -42,27 +63,35 @@ public class SpawnHandler : MonoBehaviour {
         }
     }
 
-    void SpawnSquareSpike() {
-
-        float spawnX = Random.Range(transform.position.x + minSpawnAhead, transform.position.x + maxSpawnAhead);
-        float spawnY = Random.Range(transform.position.y + minSpawnHeight, transform.position.y + maxSpawnHeight);
-        if(spawnX < -6) {
+    GameObject Spawn(GameObject objectToSpawn, SpawnSettings objectSpawnSettings) {
+        float spawnX = Random.Range(transform.position.x + objectSpawnSettings.minSpawnAhead, transform.position.x + objectSpawnSettings.maxSpawnAhead);
+        float spawnY = Random.Range(transform.position.y + objectSpawnSettings.minSpawnHeight, transform.position.y + objectSpawnSettings.maxSpawnHeight);
+        if (spawnX < -6) {
             spawnX = -6;
         }
-        Vector2 enemyPos = new Vector2(spawnX, spawnY);
+        Vector2 pos = new Vector2(spawnX, spawnY);
 
-        GameObject enemy = (GameObject)Instantiate(squareSpikeEnemy);
-        EnemySquareSpikeBehaviour enemyBehaviour = enemy.GetComponent<EnemySquareSpikeBehaviour>();
+        GameObject spawn = (GameObject)Instantiate(objectToSpawn);
+        spawn.transform.position = pos;
+        return spawn;
+    }
+
+    void SpawnSquareSpike() {
+        enemySpawn = Spawn(squareSpikeEnemy, squareSpikeSettings);
+        EnemySquareSpikeBehaviour enemyBehaviour = enemySpawn.GetComponent<EnemySquareSpikeBehaviour>();
         enemyBehaviour.targetObject = transform.gameObject;
-        enemy.transform.position = enemyPos;
+    }
+
+    void SpawnHeart() {
+        heartSpawn = Spawn(heart, heartSettings);
     }
 
     public bool setSpawnRate(float rate) {
-        if(rate <= 0) {
+        if (rate <= 0) {
             return false;
         }
 
-        spawnRate = rate;
+        squareSpikeSettings.spawnRate = rate;
 
         return true;
     }
@@ -70,7 +99,14 @@ public class SpawnHandler : MonoBehaviour {
     private IEnumerator SpawnSquareSpikeEnemies() {
         while (true) {
             SpawnSquareSpike();
-            yield return new WaitForSeconds(spawnRate);
+            yield return new WaitForSeconds(squareSpikeSettings.spawnRate);
+        }
+    }
+
+    private IEnumerator SpawnHearts() {
+        while(true) {
+            SpawnHeart();
+            yield return new WaitForSeconds(heartSettings.spawnRate);
         }
     }
 }

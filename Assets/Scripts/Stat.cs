@@ -46,4 +46,7 @@ public class Stat {
         currentValue += val;
     }
 
+    public bool isMax() {
+        return _currentValue == _maxValue;
+    }
 }
