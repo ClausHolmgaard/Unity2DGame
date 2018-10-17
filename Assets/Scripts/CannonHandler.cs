@@ -40,6 +40,8 @@ public class CannonHandler : MonoBehaviour {
 
         Transform origin = transform.Find("BulletOrigin");
         newBullet.transform.position = origin.position;
+        newBullet.transform.rotation = transform.rotation;
+        newBullet.transform.rotation *= Quaternion.Euler(0, 0, 40); // this adds rotation
         Rigidbody2D newBulletBody = newBullet.GetComponent<Rigidbody2D>();
         
         foreach (CircleCollider2D coll in newBullet.GetComponents<CircleCollider2D>()) {
@@ -54,19 +56,28 @@ public class CannonHandler : MonoBehaviour {
     }
 
     private void TurnCannon() {
-        direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
 
-        //direction.x = Input.GetAxisRaw("CannonX");
-        //direction.y = Input.GetAxisRaw("CannonY");
+        if(PersistentInputManager.Instance.getCannonX() != 0.0f) {
+            print(PersistentInputManager.Instance.getCannonX());
+        }
+
+        if(PersistentInputManager.Instance.lastInput == PersistentInputManager.InputEnum.gamepad) {
+            //if (PersistentInputManager.Instance.getCannonXRaw() != 0 && PersistentInputManager.Instance.getCannonYRaw() != 0)
+            direction.x = PersistentInputManager.Instance.getCannonXRaw();
+            direction.y = PersistentInputManager.Instance.getCannonYRaw();
+        } else if (PersistentInputManager.Instance.lastInput == PersistentInputManager.InputEnum.kbm) {
+            direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+        }
         
         
         if(direction.x == 0.0 && direction.y == 0.0) {
             return;
         }
+        
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90;  // -90 due to sprite offset
         Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-        //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
-        transform.rotation = rotation;
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
+        //transform.rotation = rotation;
     }
 }

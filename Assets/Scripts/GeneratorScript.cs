@@ -11,7 +11,16 @@ public class GeneratorScript : MonoBehaviour {
     private List<GameObject> currentRooms;
 
     [SerializeField]
+    private GameObject[] availableDecos;
+
+    [SerializeField]
     private int maxNumberOfRooms = 3;
+
+    [SerializeField]
+    private int minDecoPerRoom = 0;
+
+    [SerializeField]
+    private int maxDecoPerRoom = 4;
 
     private float screenWidthInPoints;
 
@@ -35,6 +44,19 @@ public class GeneratorScript : MonoBehaviour {
         float roomCenter = farthestRoomEndX + roomWidth * 0.5f;
         float background_y = -room.transform.Find("Background").localPosition.y;
         room.transform.position = new Vector3(roomCenter, background_y, 0);
+
+        int numDecos = Random.Range(minDecoPerRoom, maxDecoPerRoom + 1);
+        int decoIndex;
+        float roomStart = roomCenter - roomWidth * 0.5f;
+        float roomEnd = roomStart + roomWidth;
+        for (int i = 0; i < numDecos; i++) {
+            decoIndex = Random.Range(0, availableDecos.Length);
+            GameObject deco = (GameObject)Instantiate(availableDecos[decoIndex]);
+            float decoX = Random.Range(roomStart, roomEnd);
+            Vector2 decoPos = new Vector2(decoX, -5.0f);
+            deco.transform.position = decoPos;
+        }
+
 
         currentRooms.Insert(0, room);
     }

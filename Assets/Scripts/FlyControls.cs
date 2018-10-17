@@ -32,7 +32,7 @@ public class FlyControls : MonoBehaviour, IControls {
     }
 
     public void handleWeapons() {
-        if (Input.GetButtonDown("Fire1")) {
+        if (PersistentInputManager.Instance.isFire()) {
             cannonHandler.Fire();
         }
     }
@@ -49,16 +49,16 @@ public class FlyControls : MonoBehaviour, IControls {
     public void doMovement() {
         float xScale = Mathf.Abs(transform.localScale.x);
         // Flip character to face correct direction
-        if (Input.GetAxisRaw("Horizontal") < 0) {
+        if (PersistentInputManager.Instance.getHorizontal() < 0) {
             transform.localScale = new Vector2(-xScale, transform.localScale.y);
-        } else if (Input.GetAxisRaw("Horizontal") > 0) {
+        } else if (PersistentInputManager.Instance.getHorizontal() > 0) {
             transform.localScale = new Vector2(xScale, transform.localScale.y);
         }
 
         //playerRigidbody.AddForce(new Vector2(Input.GetAxis("Horizontal") * moveSpeed, Input.GetAxis("Vertical") * moveSpeed));
         Vector2 pos = transform.position;
-        pos.x += Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
-        pos.y += Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
+        pos.x += PersistentInputManager.Instance.getHorizontal() * moveSpeed * Time.deltaTime;
+        pos.y += PersistentInputManager.Instance.getVertical() * moveSpeed * Time.deltaTime;
         transform.position = pos;
 
 

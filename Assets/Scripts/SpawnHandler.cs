@@ -10,6 +10,15 @@ public class SpawnHandler : MonoBehaviour {
     [SerializeField]
     private GameObject heart;
 
+    [SerializeField]
+    private GameObject platform;
+
+    private float globalSpawnModifier = 1.0f;
+    private float minSpawnX = -6.0f;
+    private float platformOffset = 0.2f;
+    private float lastHeartPlayerX = 0.0f;
+    private float playerMaxX = 0.0f;
+
     private struct SpawnSettings {
         public float minSpawnAhead;
         public float minSpawnHeight;
@@ -26,11 +35,12 @@ public class SpawnHandler : MonoBehaviour {
         }
     }
 
-    SpawnSettings squareSpikeSettings = new SpawnSettings(-5.0f, 30.0f, 1.5f, 8.0f, 4.0f);
+    SpawnSettings squareSpikeSettings = new SpawnSettings(-5.0f, 30.0f, 1.5f, 8.0f, 1.0f);
     SpawnSettings heartSettings = new SpawnSettings(1.0f, 30.0f, 1.5f, 8.0f, 10.0f); 
 
     private GameObject enemySpawn;
     private GameObject heartSpawn;
+    private GameObject grassPlatform;
     private List<GameObject> allHearts = new List<GameObject>();
     private BoxCollider2D playerCollider;
 
@@ -49,7 +59,9 @@ public class SpawnHandler : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-
+        if(transform.position.x > playerMaxX) {
+            playerMaxX = transform.position.x;
+        }
     }
 
     public void stopAll() {
@@ -68,8 +80,8 @@ public class SpawnHandler : MonoBehaviour {
     GameObject Spawn(GameObject objectToSpawn, SpawnSettings objectSpawnSettings) {
         float spawnX = Random.Range(transform.position.x + objectSpawnSettings.minSpawnAhead, transform.position.x + objectSpawnSettings.maxSpawnAhead);
         float spawnY = Random.Range(transform.position.y + objectSpawnSettings.minSpawnHeight, transform.position.y + objectSpawnSettings.maxSpawnHeight);
-        if (spawnX < -6) {
-            spawnX = -6;
+        if (spawnX < minSpawnX) {
+            spawnX = minSpawnX;
         }
         Vector2 pos = new Vector2(spawnX, spawnY);
 
@@ -85,7 +97,13 @@ public class SpawnHandler : MonoBehaviour {
     }
 
     void SpawnHeart() {
+        // Only spawn hearts if player moves forward
+        if (!(playerMaxX > lastHeartPlayerX + heartSettings.minSpawnAhead)) {
+            return;
+        }
+
         heartSpawn = Spawn(heart, heartSettings);
+        lastHeartPlayerX = transform.position.x;
 
         foreach (BoxCollider2D coll in heartSpawn.GetComponents<BoxCollider2D>()) {
             if (!coll.isTrigger) {
@@ -93,23 +111,27 @@ public class SpawnHandler : MonoBehaviour {
             }
         }
 
+        Vector2 pos = new Vector2(heartSpawn.transform.position.x, heartSpawn.transform.position.y - platformOffset);
+        GameObject platformSpawn = (GameObject)Instantiate(platform);
+        platformSpawn.transform.position = pos;
+
         allHearts.Add(heartSpawn);
     }
 
-    public bool setSpawnRate(float rate) {
-        if (rate <= 0) {
+    public bool setSpawnRate(float rateModifier) {
+        if (rateModifier <= 0) {
             return false;
         }
-
-        squareSpikeSettings.spawnRate = rate;
-
+        
+        globalSpawnModifier = rateModifier;
+        print("Square enemy spawn rate: " + squareSpikeSettings.spawnRate * globalSpawnModifier);
         return true;
     }
 
     private IEnumerator SpawnSquareSpikeEnemies() {
         while (true) {
             SpawnSquareSpike();
-            yield return new WaitForSeconds(squareSpikeSettings.spawnRate);
+            yield return new WaitForSeconds(squareSpikeSettings.spawnRate * globalSpawnModifier);
         }
     }
 

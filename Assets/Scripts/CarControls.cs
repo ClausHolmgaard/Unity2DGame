@@ -38,7 +38,7 @@ public class CarControls : MonoBehaviour, IControls {
     }
 
     public void handleWeapons() {
-        if (Input.GetButtonDown("Fire1")) {
+        if(PersistentInputManager.Instance.isFire()) {
             cannonHandler.Fire();
         }
     }
@@ -50,7 +50,7 @@ public class CarControls : MonoBehaviour, IControls {
     public void handleMoveStates() {
 
         // Moving on x axis
-        if (Input.GetAxisRaw("Horizontal") != 0) {
+        if (PersistentInputManager.Instance.getHorizontal() != 0) {
             if (!isRunning) {
                 playerAnimator.SetTrigger("triggerRun");
             }
@@ -61,10 +61,14 @@ public class CarControls : MonoBehaviour, IControls {
 
         xScale = Mathf.Abs(transform.localScale.x);
         // Flip character to face correct direction
-        if (Input.GetAxisRaw("Horizontal") < 0) {
+        // TODO: Try flipping cannong aswell
+        float cannonXScale = Mathf.Abs(cannon.transform.localScale.x);
+        if (PersistentInputManager.Instance.getHorizontalRaw() < 0) {
             transform.localScale = new Vector2(-xScale, transform.localScale.y);
-        } else if (Input.GetAxisRaw("Horizontal") > 0) {
+            cannon.transform.localScale = new Vector2(-cannonXScale, cannon.transform.localScale.y);
+        } else if (PersistentInputManager.Instance.getHorizontalRaw() > 0) {
             transform.localScale = new Vector2(xScale, transform.localScale.y);
+            cannon.transform.localScale = new Vector2(cannonXScale, cannon.transform.localScale.y);
         }
 
         playerAnimator.SetBool("isOnGround", isGrounded);
@@ -74,13 +78,13 @@ public class CarControls : MonoBehaviour, IControls {
     public void doMovement() {
 
         // Only jump when on ground
-        if (Input.GetButtonDown("Jump") && isGrounded) {
+        if (PersistentInputManager.Instance.isJump() && isGrounded) {
             playerRigidbody.AddForce(new Vector2(0, jumpForce));
             playerAnimator.SetTrigger("triggerJump");
         }
 
         // Horizontal movement
-        playerRigidbody.AddForce(new Vector2(Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0));
+        playerRigidbody.AddForce(new Vector2(PersistentInputManager.Instance.getHorizontal() * moveSpeed * Time.deltaTime, 0));
     }
 
     public void die() {

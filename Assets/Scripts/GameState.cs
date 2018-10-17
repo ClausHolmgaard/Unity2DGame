@@ -36,13 +36,13 @@ public class GameState : MonoBehaviour {
     }
 
     private void Update() {
-        if (Input.GetButtonDown("Pause")) {
+        if (PersistentInputManager.Instance.isPause()) {
             newEvent(GameEventsEnum.GameKeyPause);
-        } else if (Input.GetButtonDown("Confirm")) {
+        } else if (PersistentInputManager.Instance.isConfirm()) {
             newEvent(GameEventsEnum.GameKeyConfirm);
-        } else if (Input.GetButtonDown("Exit")) {
+        } else if (PersistentInputManager.Instance.isExit()) {
             newEvent(GameEventsEnum.GameKeyExit);
-        } else if (Input.GetButtonDown("Fire1") ) {
+        } else if (PersistentInputManager.Instance.isFire()) {
             newEvent(GameEventsEnum.GameKeyFire);
         }
         

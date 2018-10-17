@@ -9,6 +9,9 @@ public class PlayerController : MonoBehaviour {
     private Stat health;
 
     [SerializeField]
+    private Stat energy;
+
+    [SerializeField]
     private Text pointText;
 
     [SerializeField]
@@ -19,6 +22,12 @@ public class PlayerController : MonoBehaviour {
 
     [SerializeField]
     private GameObject heartIndicator;
+
+    [SerializeField]
+    private float flyingEnergyDrain = 10.0f;
+
+    [SerializeField]
+    private float energyRegen = 5.0f;
 
     GameState gameState;
 
@@ -55,6 +64,9 @@ public class PlayerController : MonoBehaviour {
     private void Awake() {
         health.maxValue = 100.0f;
         health.currentValue = 100.0f;
+
+        energy.maxValue = 100.0f;
+        energy.currentValue = 100.0f;
     }
 
     // Use this for initialization
@@ -98,11 +110,24 @@ public class PlayerController : MonoBehaviour {
             currentControls = fly;
         }
 
+        helicopterEnergyHandler();
         IndicateHeart();
     }
 
     void FixedUpdate() {
         
+    }
+
+    void helicopterEnergyHandler() {
+        if(vehicleState == VehicleStateEnum.Fly) {
+            energy.reduceValue(flyingEnergyDrain * Time.deltaTime);
+        } else {
+            energy.increaseValue(energyRegen * Time.deltaTime);
+        }
+
+        if(energy.currentValue < 0.5f && vehicleState == VehicleStateEnum.Fly) {
+            doTransform();
+        }
     }
 
     void IndicateHeart() {
@@ -153,7 +178,7 @@ public class PlayerController : MonoBehaviour {
 
     void handleControls() {
         
-        if(Input.GetButtonDown("Transform")) {
+        if(PersistentInputManager.Instance.isTransform()) {
             doTransform();
         }
 
@@ -242,7 +267,6 @@ public class PlayerController : MonoBehaviour {
 
     private void updateSpawnRate() {
         float rate = Mathf.Pow(0.9995f, currentPoints);
-        print("Setting spawn rate at: " + rate);
         spawner.setSpawnRate(rate);
     }
 

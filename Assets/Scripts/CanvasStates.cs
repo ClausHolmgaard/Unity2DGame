@@ -21,6 +21,15 @@ public class CanvasStates : MonoBehaviour {
     private Text helpText;
 
     [SerializeField]
+    private Text continueText;
+
+    [SerializeField]
+    private Text restartText;
+
+    [SerializeField]
+    private Text startTipText;
+
+    [SerializeField]
     private float helpTextDuration = 10.0f;
 
     [SerializeField]
@@ -33,8 +42,10 @@ public class CanvasStates : MonoBehaviour {
 
         //gameState = player.GetComponent<PlayerController>().getGameState();
         gameState = player.GetComponent<GameState>();
-        
-	}
+        setTextByInput(true);
+    }
+
+    PersistentInputManager.InputEnum textSetBy = PersistentInputManager.InputEnum.none;
 	
 	// Update is called once per frame
 	void Update () {
@@ -57,6 +68,30 @@ public class CanvasStates : MonoBehaviour {
                 break;
             default:
                 break;
+        }
+
+        setTextByInput(false);
+    }
+
+    void setTextByInput(bool forceSet) {
+        if(textSetBy == PersistentInputManager.Instance.lastInput && !forceSet) {
+            return;
+        }
+
+        if (PersistentInputManager.Instance.lastInput == PersistentInputManager.InputEnum.gamepad) {
+            continueText.text = "Press <RB> or <X> to continue.\nPress <Back> to quit game.";
+            restartText.text = "Press <X> for new game.\nPress <Back> to quit game.";
+            startTipText.text = "Press <RB> or <Start> to start.\nPress <Back> to quit game.";
+            helpText.text = "Jump: <A> or <LB>\nFire: <B> or <RB>\nTransform: <Y>\nMovement: <Left Stick>\nCannon: <Right Stick>\nKeep moving forward to spawn hearts";
+
+            textSetBy = PersistentInputManager.InputEnum.gamepad;
+        } else if(PersistentInputManager.Instance.lastInput == PersistentInputManager.InputEnum.kbm) {
+            continueText.text = "Press <LMB> or <Enter> to continue.\nPress <q> to quit game.";
+            restartText.text = "Press <Enter> for new game.\nPress <q> to quit game.";
+            startTipText.text = "Press <LMB> or <Enter> to start.\nPress <q> to quit game.";
+            helpText.text = "Controls:\nJump: <Space>\nFire: <LMB>\nTransform: <R>\nMovement: <W>, <A>, <S>, <D>\nCannon: <Mouse>\nKeep moving forward to spawn hearts";
+
+            textSetBy = PersistentInputManager.InputEnum.kbm;
         }
     }
 
