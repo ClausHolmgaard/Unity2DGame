@@ -18,6 +18,7 @@ public class SpawnHandler : MonoBehaviour {
     private float platformOffset = 0.2f;
     private float lastHeartPlayerX = 0.0f;
     private float playerMaxX = 0.0f;
+    private float minSpawnFromPlayer = 5.0f;
 
     private struct SpawnSettings {
         public float minSpawnAhead;
@@ -35,7 +36,7 @@ public class SpawnHandler : MonoBehaviour {
         }
     }
 
-    SpawnSettings squareSpikeSettings = new SpawnSettings(-5.0f, 30.0f, 1.5f, 8.0f, 1.0f);
+    SpawnSettings squareSpikeSettings = new SpawnSettings(-10.0f, 30.0f, 1.5f, 8.0f, 1.0f);
     SpawnSettings heartSettings = new SpawnSettings(1.0f, 30.0f, 1.5f, 8.0f, 10.0f); 
 
     private GameObject enemySpawn;
@@ -85,6 +86,14 @@ public class SpawnHandler : MonoBehaviour {
         }
         Vector2 pos = new Vector2(spawnX, spawnY);
 
+        if (Vector2.Distance(pos, transform.position) < minSpawnFromPlayer) {
+            if(pos.x < transform.position.x) {
+                pos.x -= minSpawnFromPlayer;
+            } else {
+                pos.x += minSpawnFromPlayer;
+            }
+        }
+
         GameObject spawn = (GameObject)Instantiate(objectToSpawn);
         spawn.transform.position = pos;
         return spawn;
@@ -98,7 +107,7 @@ public class SpawnHandler : MonoBehaviour {
 
     void SpawnHeart() {
         // Only spawn hearts if player moves forward
-        if (!(playerMaxX > lastHeartPlayerX + heartSettings.minSpawnAhead)) {
+        if (!(playerMaxX > lastHeartPlayerX + (heartSettings.minSpawnAhead + heartSettings.maxSpawnAhead) / 2)) {
             return;
         }
 

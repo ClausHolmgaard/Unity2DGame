@@ -29,6 +29,9 @@ public class PlayerController : MonoBehaviour {
     [SerializeField]
     private float energyRegen = 5.0f;
 
+    [SerializeField]
+    private float damageImmunityTime = 0.5f;
+
     GameState gameState;
 
     CarControls car;
@@ -41,6 +44,7 @@ public class PlayerController : MonoBehaviour {
     bool isGrounded = true;
     float animationHideTime = 0.2f;
     float screenWidthInPoints;
+    float lastTimeDamageTaken;
 
     public Transform groundCheckTransform;
     public LayerMask groundCheckLayerMask;
@@ -48,8 +52,8 @@ public class PlayerController : MonoBehaviour {
     private SpawnHandler spawner;
     private SpriteRenderer playerRenderer;
     private Animator playerAnimator;
-    private BoxCollider2D playerCollider;
-    private Rigidbody2D playerRigidBody;
+    //private BoxCollider2D playerCollider;
+    //private Rigidbody2D playerRigidBody;
     private SpriteRenderer heartIndicatorRenderer;
 
     private Vector3 position;
@@ -81,8 +85,8 @@ public class PlayerController : MonoBehaviour {
         gameState = GetComponent<GameState>();
         playerRenderer = GetComponent<SpriteRenderer>();
         playerAnimator = GetComponent<Animator>();
-        playerCollider = GetComponent<BoxCollider2D>();
-        playerRigidBody = GetComponent<Rigidbody2D>();
+        //playerCollider = GetComponent<BoxCollider2D>();
+        //playerRigidBody = GetComponent<Rigidbody2D>();
         heartIndicatorRenderer = heartIndicator.GetComponent<SpriteRenderer>();
 
         // Start on ground
@@ -228,9 +232,13 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void reduceHealth(float reduceHP) {
-        playerAudio.Play();
-        health.reduceValue(reduceHP);
-        StartCoroutine(flashRed());
+
+        if (Time.time - lastTimeDamageTaken > damageImmunityTime) {
+            playerAudio.Play();
+            health.reduceValue(reduceHP);
+            StartCoroutine(flashRed());
+            lastTimeDamageTaken = Time.time;
+        }
     }
 
     public void increaseHealth(float increaseHP) {
