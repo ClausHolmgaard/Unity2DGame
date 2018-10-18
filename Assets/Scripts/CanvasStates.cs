@@ -81,7 +81,7 @@ public class CanvasStates : MonoBehaviour {
         if (PersistentInputManager.Instance.lastInput == PersistentInputManager.InputEnum.gamepad) {
             continueText.text = "Press <RB> or <X> to continue.\nPress <Back> to quit game.";
             restartText.text = "Press <X> for new game.\nPress <Back> to quit game.";
-            startTipText.text = "Press <RB> or <Start> to start.\nPress <Back> to quit game.";
+            startTipText.text = "Press <RB> or <X> to start.\nPress <Back> to quit game.";
             helpText.text = "Jump: <A> or <LB>\nFire: <B> or <RB>\nTransform: <Y>\nMovement: <Left Stick>\nCannon: <Right Stick>\nKeep moving forward to spawn hearts";
 
             textSetBy = PersistentInputManager.InputEnum.gamepad;
@@ -102,6 +102,7 @@ public class CanvasStates : MonoBehaviour {
     }
 
     void showGameOverMenu() {
+        helpText.gameObject.SetActive(false);
         gameOverText.gameObject.SetActive(true);
     }
 
@@ -111,6 +112,7 @@ public class CanvasStates : MonoBehaviour {
     }
 
     void showStartMenu() {
+        helpText.gameObject.SetActive(false);
         startText.gameObject.SetActive(true);
     }
 
