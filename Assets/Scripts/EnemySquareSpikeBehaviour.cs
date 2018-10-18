@@ -108,7 +108,7 @@ public class EnemySquareSpikeBehaviour : MonoBehaviour {
     }
 
     IEnumerator flashRed() {
-        Color oldColor = thisRenderer.color;
+        Color oldColor = Color.white; // thisRenderer.color;
         thisRenderer.color = Color.red;
         yield return new WaitForSeconds(0.1f);
         thisRenderer.color = oldColor;

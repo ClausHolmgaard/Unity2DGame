@@ -52,8 +52,6 @@ public class PlayerController : MonoBehaviour {
     private SpawnHandler spawner;
     private SpriteRenderer playerRenderer;
     private Animator playerAnimator;
-    //private BoxCollider2D playerCollider;
-    //private Rigidbody2D playerRigidBody;
     private SpriteRenderer heartIndicatorRenderer;
 
     private Vector3 position;
@@ -85,8 +83,6 @@ public class PlayerController : MonoBehaviour {
         gameState = GetComponent<GameState>();
         playerRenderer = GetComponent<SpriteRenderer>();
         playerAnimator = GetComponent<Animator>();
-        //playerCollider = GetComponent<BoxCollider2D>();
-        //playerRigidBody = GetComponent<Rigidbody2D>();
         heartIndicatorRenderer = heartIndicator.GetComponent<SpriteRenderer>();
 
         // Start on ground
@@ -243,8 +239,6 @@ public class PlayerController : MonoBehaviour {
 
     public void increaseHealth(float increaseHP) {
         health.increaseValue(increaseHP);
-        // TODO: Play sound?
-        // TODO: Flash green?
     }
 
     public bool isHealthMax() {
@@ -252,7 +246,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     IEnumerator flashRed() {
-        Color oldColor = playerRenderer.color;
+        Color oldColor = Color.white; // playerRenderer.color;
         playerRenderer.color = Color.red;
         yield return new WaitForSeconds(0.1f);
         playerRenderer.color = oldColor;
